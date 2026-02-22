@@ -185,28 +185,64 @@
             }
         }
 
-        // --- PARSOVÁNÍ CSV ---
+// --- PARSOVÁNÍ CSV (Opravená a robustní verze) ---
         function parseCSV(csvText) {
-            const rows = csvText.split(/\r?\n/);
-            const headers = rows[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
-            const data = [];
+            const result = [];
+            let row = [];
+            let value = '';
+            let inQuotes = false;
 
-            for (let i = 1; i < rows.length; i++) {
-                if (!rows[i].trim()) continue; // Přeskočit prázdné řádky
+            for (let i = 0; i < csvText.length; i++) {
+                let char = csvText[i];
                 
-                // Rozdělení podle čárky, ale s ignorováním čárek uvnitř uvozovek
-                const rowRegex = /(".*?"|[^",\s]+)(?=\s*,|\s*$)/g;
-                const match = rows[i].match(rowRegex);
-                
-                if (match) {
-                    const rowData = {};
-                    headers.forEach((header, index) => {
-                        let value = match[index] ? match[index].replace(/^"|"$/g, '').trim() : '';
-                        rowData[header] = value;
-                    });
-                    data.push(rowData);
+                // Řešení uvozovek (Google Sheets jimi obaluje texty s čárkou)
+                if (char === '"') {
+                    if (inQuotes && csvText[i + 1] === '"') {
+                        value += '"'; // Escapovaná uvozovka
+                        i++; 
+                    } else {
+                        inQuotes = !inQuotes; // Přepínač: jsme uvnitř textu s čárkami
+                    }
+                } 
+                // Čárka jako oddělovač (pouze pokud nejsme schovaní v uvozovkách)
+                else if (char === ',' && !inQuotes) {
+                    row.push(value.trim());
+                    value = '';
+                } 
+                // Konec řádku
+                else if ((char === '\n' || char === '\r') && !inQuotes) {
+                    if (char === '\r' && csvText[i + 1] === '\n') i++; // Windows formát
+                    
+                    row.push(value.trim());
+                    if (row.join('').trim() !== '') { 
+                        result.push(row);
+                    }
+                    row = [];
+                    value = '';
+                } 
+                // Běžný znak
+                else {
+                    value += char;
                 }
             }
+
+            // Přidání posledního řádku (pokud chybí odřádkování na konci)
+            if (value !== '' || row.length > 0) {
+                row.push(value.trim());
+                if (row.join('').trim() !== '') result.push(row);
+            }
+
+            // Převedení matice na objekty podle hlaviček
+            const headers = result[0];
+            const data = [];
+            for (let i = 1; i < result.length; i++) {
+                const obj = {};
+                for (let j = 0; j < headers.length; j++) {
+                    obj[headers[j]] = result[i][j] || '';
+                }
+                data.push(obj);
+            }
+
             return data;
         }
 
@@ -287,4 +323,5 @@
     </script>
 </body>
 </html>
+
 
