@@ -3,325 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acer Aukce a Burza</title>
+    <title>Acer Burza</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <style>
-        /* --- ACER BRAND STYLES --- */
-        body {
-            font-family: 'Trebuchet MS', sans-serif;
-            background-color: #f4f4f4;
-            color: #333;
-        }
+        body { font-family: 'Trebuchet MS', sans-serif; background-color: #f4f4f4; color: #333; }
+        .header-acer { background-color: #80C343; color: white; padding: 20px 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .cnb-bar { background-color: #333; color: #fff; padding: 8px 0; font-size: 0.9rem; text-align: center; }
+        
+        .card { border: none; border-radius: 12px; transition: transform 0.2s; height: 100%; box-shadow: 0 2px 8px rgba(0,0,0,0.05); position: relative; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); }
+        .card-img-top { height: 200px; object-fit: contain; padding: 20px; border-bottom: 1px solid #f0f0f0; }
+        .card-body { padding: 20px; display: flex; flex-direction: column; }
+        
+        .product-title { font-size: 1.1rem; font-weight: bold; margin-bottom: 5px; }
+        .tech-specs { font-size: 0.85rem; color: #666; margin-bottom: 15px; }
+        
+        .stav-badge { position: absolute; top: 15px; left: 15px; padding: 5px 12px; border-radius: 8px; font-weight: bold; color: white; font-size: 0.9rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .stav-A { background-color: #80C343; } /* Zelená */
+        .stav-B { background-color: #0078D7; } /* Modrá */
+        .stav-C { background-color: #F28C28; } /* Oranžová */
+        
+        .status-badge { position: absolute; top: 15px; right: 15px; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .status-active { background-color: #333; color: white; }
+        .status-sold { background-color: #898988; color: white; }
 
-        .header-acer {
-            background-color: #80C343; /* Acer Green */
-            color: white;
-            padding: 30px 0;
-            margin-bottom: 40px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+        .price-box { background-color: #f8f9fa; padding: 10px; border-radius: 8px; margin-top: auto; border: 1px solid #e9ecef; }
+        .price-eur { font-size: 1.6rem; color: #80C343; font-weight: bold; line-height: 1; }
+        .price-czk { font-size: 1rem; color: #555; font-weight: bold; margin-top: 4px; }
+        .price-old { text-decoration: line-through; color: #898988; font-size: 0.85rem; }
+        
+        .meta-info { font-size: 0.8rem; color: #777; margin-top: 10px; display: flex; justify-content: space-between; }
+        .bids-badge { background-color: #e9ecef; color: #333; padding: 3px 8px; border-radius: 12px; font-weight: bold; }
 
-        .header-acer h1 {
-            font-weight: bold;
-            margin: 0;
-        }
-
-        .card {
-            border: none;
-            border-radius: 12px;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            background: white;
-            height: 100%;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
-        }
-
-        .card-img-top {
-            height: 220px;
-            object-fit: contain;
-            padding: 20px;
-            background-color: #ffffff;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .card-body {
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .product-title {
-            font-size: 1.15rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-            color: #000;
-        }
-
-        .product-desc {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 15px;
-            flex-grow: 1; /* Vyplní zbývající místo a zarovná ceny dolů */
-            overflow: hidden;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-        }
-
-        .price-tag {
-            font-size: 1.6rem;
-            color: #80C343; /* Acer Green */
-            font-weight: bold;
-            margin-bottom: 2px;
-        }
-
-        .price-original {
-            text-decoration: line-through;
-            color: #898988; /* Tintree Grey */
-            font-size: 0.95rem;
-        }
-
-        .status-badge {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .status-active {
-            background-color: #80C343;
-            color: white;
-        }
-
-        .status-sold {
-            background-color: #898988;
-            color: white;
-        }
-
-        .btn-acer {
-            background-color: #80C343;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 10px 20px;
-            width: 100%;
-            font-weight: bold;
-            margin-top: 15px;
-            text-decoration: none;
-            display: block;
-            text-align: center;
-            transition: background-color 0.2s;
-        }
-
-        .btn-acer:hover {
-            background-color: #6DA838;
-            color: white;
-        }
-
-        .btn-disabled {
-            background-color: #e0e0e0;
-            color: #898988;
-            cursor: not-allowed;
-            pointer-events: none;
-            margin-top: 15px;
-        }
+        .btn-acer { background-color: #80C343; color: white; border-radius: 25px; padding: 8px 20px; width: 100%; font-weight: bold; margin-top: 15px; text-decoration: none; display: block; text-align: center; }
+        .btn-acer:hover { background-color: #6DA838; color: white; }
+        .btn-disabled { background-color: #e0e0e0; color: #898988; pointer-events: none; margin-top: 15px; text-align: center; display: block; padding: 8px; border-radius: 25px; }
     </style>
 </head>
 <body>
 
+    <div class="cnb-bar">
+        Aktuální kurz ČNB střed: <strong id="cnb-rate">Načítám...</strong>
+    </div>
+
     <div class="header-acer text-center">
-        <h1>Burza techniky Acer</h1>
-        <p class="mt-2 mb-0">Aktuální nabídka zařízení pro zaměstnance a partnery</p>
+        <h2 class="mb-0">Burza techniky Acer</h2>
     </div>
 
     <div class="container mb-5">
-        <div id="product-grid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        <div id="product-grid" class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4 mt-2">
             <div class="text-center w-100 mt-5" id="loading-spinner">
-                <div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;"></div>
-                <h5 class="mt-3">Načítám aktuální data katalogu...</h5>
+                <div class="spinner-border text-success" role="status"></div>
+                <p class="mt-2">Příprava katalogu...</p>
             </div>
         </div>
     </div>
 
     <script>
-        // --- NASTAVENÍ ---
+        // --- KONFIGURACE ---
         const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfOJzHS5TteB4jDdVfMMdhFcVDGK1Oqh7ad1A6bXLhdPvuju1mrldVFaie7uyt2pVO1_s2RHCrmU3v/pub?gid=0&single=true&output=csv"; 
-        
-        // ZDE DOPLŇTE URL VAŠEHO PLUMSAIL FORMULÁŘE (bez otazníku a parametrů na konci)
-        const PLUMSAIL_FORM_URL = "https://forms.plumsail.com/ece12aa2-a403-487b-b616-3718a3764dc7";
+        const PLUMSAIL_FORM_URL = "https://forms.plumsail.com/VAŠE_ID";
 
-        // --- NAČTENÍ DAT ---
-        async function loadCatalog() {
+        let eurRate = 25.30; // Fallback kurz
+        
+        // --- START APLIKACE ---
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchCNBRate();
+            loadCatalog();
+        });
+
+        // --- NAČTENÍ KURZU Z ČNB ---
+        async function fetchCNBRate() {
             try {
-                // Přidání časového razítka proti cachování prohlížečem
-                const cacheBuster = new Date().getTime();
-                const response = await fetch(`${GOOGLE_SHEET_CSV_URL}&t=${cacheBuster}`);
+                // Použijeme proxy pro překonání CORS restrikcí textového souboru ČNB
+                const cnbUrl = 'https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/denni_kurz.txt';
+                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(cnbUrl)}`);
+                const data = await response.json();
                 
-                if (!response.ok) throw new Error("Chyba při stahování dat");
+                // Parsování textu
+                const lines = data.contents.split('\n');
+                const eurLine = lines.find(line => line.includes('|EUR|'));
                 
-                const data = await response.text();
-                const products = parseCSV(data);
-                
-                renderProducts(products);
+                if (eurLine) {
+                    const parts = eurLine.split('|');
+                    eurRate = parseFloat(parts[4].replace(',', '.'));
+                    document.getElementById('cnb-rate').innerText = `1 EUR = ${eurRate.toFixed(3).replace('.', ',')} CZK`;
+                } else {
+                    throw new Error("EUR nenalezeno v datech");
+                }
             } catch (error) {
-                console.error("Chyba:", error);
-                document.getElementById('product-grid').innerHTML = `
-                    <div class="col-12 text-center mt-5">
-                        <div class="alert alert-danger">
-                            Nepodařilo se načíst katalog. Zkontrolujte připojení k internetu nebo nastavení sdílení tabulky.
-                        </div>
-                    </div>`;
+                console.error("Chyba při stahování kurzu ČNB:", error);
+                document.getElementById('cnb-rate').innerText = `1 EUR = ${eurRate.toFixed(3).replace('.', ',')} CZK (Záložní kurz)`;
             }
         }
 
-// --- PARSOVÁNÍ CSV (Opravená a robustní verze) ---
-        function parseCSV(csvText) {
-            const result = [];
-            let row = [];
-            let value = '';
-            let inQuotes = false;
+        // --- NAČTENÍ A PARSOVÁNÍ DAT ---
+        async function loadCatalog() {
+            try {
+                const response = await fetch(`${GOOGLE_SHEET_CSV_URL}&t=${new Date().getTime()}`);
+                const csvText = await response.text();
+                const products = parseCSV(csvText);
+                renderProducts(products);
+            } catch (error) {
+                document.getElementById('product-grid').innerHTML = `<div class="alert alert-danger w-100 text-center">Chyba načítání dat.</div>`;
+            }
+        }
 
+        function parseCSV(csvText) {
+            const result = []; let row = []; let value = ''; let inQuotes = false;
             for (let i = 0; i < csvText.length; i++) {
                 let char = csvText[i];
-                
-                // Řešení uvozovek (Google Sheets jimi obaluje texty s čárkou)
                 if (char === '"') {
-                    if (inQuotes && csvText[i + 1] === '"') {
-                        value += '"'; // Escapovaná uvozovka
-                        i++; 
-                    } else {
-                        inQuotes = !inQuotes; // Přepínač: jsme uvnitř textu s čárkami
-                    }
+                    if (inQuotes && csvText[i + 1] === '"') { value += '"'; i++; } 
+                    else { inQuotes = !inQuotes; }
                 } 
-                // Čárka jako oddělovač (pouze pokud nejsme schovaní v uvozovkách)
-                else if (char === ',' && !inQuotes) {
-                    row.push(value.trim());
-                    value = '';
-                } 
-                // Konec řádku
+                else if (char === ',' && !inQuotes) { row.push(value.trim()); value = ''; } 
                 else if ((char === '\n' || char === '\r') && !inQuotes) {
-                    if (char === '\r' && csvText[i + 1] === '\n') i++; // Windows formát
-                    
+                    if (char === '\r' && csvText[i + 1] === '\n') i++;
                     row.push(value.trim());
-                    if (row.join('').trim() !== '') { 
-                        result.push(row);
-                    }
-                    row = [];
-                    value = '';
+                    if (row.join('').trim() !== '') result.push(row);
+                    row = []; value = '';
                 } 
-                // Běžný znak
-                else {
-                    value += char;
-                }
+                else { value += char; }
             }
-
-            // Přidání posledního řádku (pokud chybí odřádkování na konci)
-            if (value !== '' || row.length > 0) {
-                row.push(value.trim());
-                if (row.join('').trim() !== '') result.push(row);
-            }
-
-            // Převedení matice na objekty podle hlaviček
-            const headers = result[0];
-            const data = [];
+            if (value !== '' || row.length > 0) { row.push(value.trim()); if (row.join('').trim() !== '') result.push(row); }
+            
+            const headers = result[0]; const data = [];
             for (let i = 1; i < result.length; i++) {
                 const obj = {};
-                for (let j = 0; j < headers.length; j++) {
-                    obj[headers[j]] = result[i][j] || '';
-                }
+                for (let j = 0; j < headers.length; j++) { obj[headers[j]] = result[i][j] || ''; }
                 data.push(obj);
             }
-
             return data;
         }
 
         // --- VYKRESLENÍ PRODUKTŮ ---
         function renderProducts(products) {
             const grid = document.getElementById('product-grid');
-            grid.innerHTML = ""; // Odstranit spinner
+            grid.innerHTML = "";
             
-            if (products.length === 0) {
-                grid.innerHTML = `<div class="col-12 text-center mt-5"><h4>Katalog je momentálně prázdný.</h4></div>`;
-                return;
-            }
-
             products.forEach(p => {
-                // Extrakce dat z CSV sloupců
-                const title = p['Title'] || 'Neznámý produkt';
-                const popis = p['Popis'] || '';
-                const priceStart = parseFloat(p['StartPrice']) || 0;
-                const priceCurrent = parseFloat(p['CurrentPrice']) || 0;
-                let image = p['ImageURL'] || '';
+                const title = p['Title'] || 'N/A';
                 const id = p['ID'] || '';
+                const image = p['ImageURL'] || 'https://via.placeholder.com/300?text=Bez+fotky';
                 const status = p['Status'] || 'Aktivní';
+                const stav = p['Stav'] || 'C'; // A, B, C
+                const pn = p['PartNumber'] || 'N/A';
+                const lok = p['Lokalizace'] || 'N/A';
                 
-                // Ošetření prázdného obrázku
-                if (image === '' || image.toLowerCase() === 'null') {
-                    image = 'https://via.placeholder.com/300?text=Zat%C3%ADm+bez+fotky';
+                const priplatekKlav = parseFloat(p['PriplatekKlavesnice']) || 0;
+                const priceStartEur = parseFloat(p['StartPrice']) || 0;
+                const priceCurrEur = parseFloat(p['CurrentPrice']) || 0;
+                const dropPct = parseFloat(p['DenniPoklesProcenta']) || 0;
+                const pocetNabidek = parseInt(p['PocetNabidek']) || 0;
+                
+                // Výpočty CZK
+                const priceCurrCzk = Math.round(priceCurrEur * eurRate);
+                const discountCzk = Math.round((priceStartEur - priceCurrEur) * eurRate);
+                
+                // Výpočet dnů
+                let daysListed = 'N/A';
+                if (p['ZalistovanoDne']) {
+                    const listDate = new Date(p['ZalistovanoDne']);
+                    const diffTime = Math.abs(new Date() - listDate);
+                    daysListed = Math.floor(diffTime / (1000 * 60 * 60 * 24));
                 }
 
-                // Výpočet slevy
-                let discountText = "";
-                if (priceStart > priceCurrent && priceStart > 0) {
-                    const discount = Math.round(((priceStart - priceCurrent) / priceStart) * 100);
-                    discountText = `<small class="text-success fw-bold">Sleva ${discount} %</small>`;
-                }
-
-                // Status štítek a tlačítko
-                const isSold = status.toLowerCase().includes('prod') || status.toLowerCase().includes('sold');
+                // UI logika
+                const isSold = status.toLowerCase().includes('prod');
                 const badgeClass = isSold ? 'status-sold' : 'status-active';
                 const badgeText = isSold ? 'PRODÁNO' : 'AKTIVNÍ';
                 const btnClass = isSold ? 'btn-disabled' : 'btn-acer';
-                const btnText = isSold ? 'Již prodáno' : 'Zadat nabídku';
                 
-                // Generování URL do Plumsail formuláře s parametry
-                let formLink = "#";
-                if (!isSold) {
-                    formLink = `${PLUMSAIL_FORM_URL}?produkt=${encodeURIComponent(title)}&cena=${priceCurrent}&id=${id}`;
-                }
+                // Štítek stavu
+                let stavColorClass = 'stav-C';
+                if(stav === 'A') stavColorClass = 'stav-A';
+                if(stav === 'B') stavColorClass = 'stav-B';
 
-                // Tvorba HTML karty
+                // Volitelné texty
+                let klavText = priplatekKlav > 0 ? `<div class="text-danger mt-1" style="font-size:0.8rem;">+ Výměna klávesnice: ${priplatekKlav} Kč</div>` : '';
+                let slevaText = discountCzk > 0 ? `<div class="text-success mt-1" style="font-size:0.85rem; font-weight:bold;">Sleva: ${discountCzk.toLocaleString('cs-CZ')} Kč</div>` : '';
+
                 const cardHTML = `
                 <div class="col">
                     <div class="card">
+                        <span class="stav-badge ${stavColorClass}">Stav ${stav}</span>
                         <span class="status-badge ${badgeClass}">${badgeText}</span>
-                        <img src="${image}" class="card-img-top" alt="${title}" onerror="this.src='https://via.placeholder.com/300?text=Chyba+obr%C3%A1zku'">
+                        
+                        <img src="${image}" class="card-img-top" alt="Foto">
+                        
                         <div class="card-body">
-                            <div class="product-title" title="${title}">${title}</div>
-                            <div class="product-desc" title="${popis}">${popis}</div>
+                            <div class="product-title">${title}</div>
+                            <div class="tech-specs">
+                                <strong>PN:</strong> ${pn}<br>
+                                <strong>Lok:</strong> ${lok}<br>
+                                <strong>Denní pokles:</strong> ${dropPct}%
+                            </div>
                             
-                            <div class="prices mt-auto">
-                                <div class="price-original">Běžná cena: ${priceStart.toLocaleString('cs-CZ')} Kč</div>
-                                <div class="price-tag">${priceCurrent.toLocaleString('cs-CZ')} Kč</div>
-                                ${discountText}
+                            <div class="price-box">
+                                <div class="price-old">Původně: €${priceStartEur.toFixed(2)}</div>
+                                <div class="price-eur">€${priceCurrEur.toFixed(2)}</div>
+                                <div class="price-czk">cca ${priceCurrCzk.toLocaleString('cs-CZ')} Kč</div>
+                                ${slevaText}
+                                ${klavText}
                             </div>
 
-                            <a href="${formLink}" class="btn ${btnClass}" target="_blank">${btnText}</a>
+                            <div class="meta-info">
+                                <span>V nabídce: <strong>${daysListed} dní</strong></span>
+                                <span class="bids-badge">Nabídek: ${pocetNabidek}</span>
+                            </div>
+
+                            <a href="${isSold ? '#' : `${PLUMSAIL_FORM_URL}?produkt=${encodeURIComponent(title)}&cena=${priceCurrEur}&id=${id}`}" class="btn ${btnClass}" target="_blank">
+                                ${isSold ? 'Již prodáno' : 'Zadat nabídku v €'}
+                            </a>
                         </div>
                     </div>
                 </div>
                 `;
-
                 grid.innerHTML += cardHTML;
             });
         }
-
-        // Spuštění po načtení stránky
-        document.addEventListener('DOMContentLoaded', loadCatalog);
-
     </script>
 </body>
 </html>
-
-
