@@ -182,7 +182,7 @@
                 if(stav === 'B') stavColorClass = 'stav-B';
 
                 // Volitelné texty
-                let klavText = priplatekKlav > 0 ? `<div class="text-danger mt-1" style="font-size:0.8rem;">+ Výměna klávesnice: ${priplatekKlav} Kč</div>` : '';
+                let klavText = priplatekKlav > 0 ? `<div class="text-danger mt-1" style="font-size:0.8rem;">+ Výměna klávesnice: ${priplatekKlav} €</div>` : '';
                 let slevaText = discountCzk > 0 ? `<div class="text-success mt-1" style="font-size:0.85rem; font-weight:bold;">Sleva: ${discountCzk.toLocaleString('cs-CZ')} Kč</div>` : '';
 
                 const cardHTML = `
@@ -227,5 +227,6 @@
     </script>
 </body>
 </html>
+
 
 
