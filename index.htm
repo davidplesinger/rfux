@@ -108,12 +108,12 @@
             }
         }
 
-        async function loadCatalog() {
+async function loadCatalog() {
             try {
                 const directUrl = `${ONEDRIVE_JSON_URL}&t=${new Date().getTime()}`;
                 
-                // Použití corsproxy.io pro OneDrive (lépe zvládá Microsoft přesměrování)
-                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(directUrl)}`;
+                // Nasazení CodeTabs proxy i pro OneDrive (stejně jako u ČNB)
+                const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(directUrl)}`;
                 
                 const response = await fetch(proxyUrl);
                 
@@ -123,12 +123,18 @@
                 
                 let textData = await response.text();
                 
-                // Očištění textu od neviditelného znaku BOM, který rozbíjí JSON
+                // Očištění textu od neviditelného znaku
                 textData = textData.replace(/^\uFEFF/, '').trim();
+                
+                // KONTROLA: Pokud text začíná na '<', jde o HTML chybovou stránku Microsoftu
+                if (textData.startsWith('<')) {
+                    console.error("Server nevrátil JSON, ale HTML:", textData.substring(0, 100) + "...");
+                    throw new Error("Zablokováno Microsoftem (vráceno HTML).");
+                }
                 
                 const products = JSON.parse(textData);
                 
-                // Načtení data výpočtu z prvního produktu
+                // Načtení data výpočtu
                 if (products.length > 0 && products[0].DatumVypoctu) {
                     document.getElementById('calc-date').innerText = products[0].DatumVypoctu;
                     document.getElementById('calc-date-container').style.display = 'inline';
@@ -137,7 +143,7 @@
                 renderProducts(products);
             } catch (error) {
                 console.error("Chyba při načítání dat z OneDrive:", error);
-                document.getElementById('active-grid').innerHTML = `<div class="alert alert-danger w-100 text-center">Chyba načítání dat z OneDrive. Odkaz nebo proxy služba je dočasně nedostupná. Zkontrolujte prosím konzoli (F12).</div>`;
+                document.getElementById('active-grid').innerHTML = `<div class="alert alert-danger w-100 text-center">Data nelze stáhnout kvůli bezpečnostní blokaci serveru Microsoft.</div>`;
             }
         }
 
@@ -309,3 +315,4 @@ ${isSoldCategory ?
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
