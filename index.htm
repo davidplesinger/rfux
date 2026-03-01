@@ -80,7 +80,6 @@
 
     <script>
         // --- KONFIGURACE ---
-        // Vložte přesný sdílecí odkaz na SOUBOR aukce.json s parametrem ?download=1 na konci
         const ONEDRIVE_JSON_URL = "https://acerczech-my.sharepoint.com/:u:/g/personal/info_acersynergy_cz/IQBy738DeXovQKeiNsY7QeVSARlOXt4rn1BjomZoXDK4A8w?download=1"; 
         const PLUMSAIL_FORM_URL = "https://forms.plumsail.com/ece12aa2-a403-487b-b616-3718a3764dc7"; 
 
@@ -94,36 +93,53 @@
         async function fetchCNBRate() {
             try {
                 const cnbUrl = 'https://www.cnb.cz/cs/financni-trhy/devizovy-trh/kurzy-devizoveho-trhu/kurzy-devizoveho-trhu/denni_kurz.txt';
-const response = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(cnbUrl)}`);
-const textData = await response.text();
-const lines = textData.split('\n');
+                // Použití CodeTabs pro načtení textu kurzu bez problémů s CORS
+                const response = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(cnbUrl)}`);
+                const textData = await response.text();
+                const lines = textData.split('\n');
                 const eurLine = lines.find(line => line.includes('|EUR|'));
                 if (eurLine) {
                     eurRate = parseFloat(eurLine.split('|')[4].replace(',', '.'));
                     document.getElementById('cnb-rate').innerText = `1 EUR = ${eurRate.toFixed(3).replace('.', ',')} CZK`;
                 }
             } catch (error) {
+                console.error("Chyba načítání kurzu ČNB:", error);
                 document.getElementById('cnb-rate').innerText = `1 EUR = ${eurRate.toFixed(3).replace('.', ',')} CZK (Záložní kurz)`;
             }
         }
 
-async function loadCatalog() {
-    try {
+        async function loadCatalog() {
+            try {
+                const directUrl = `${ONEDRIVE_JSON_URL}&t=${new Date().getTime()}`;
+                
+                // Použití corsproxy.io pro OneDrive (lépe zvládá Microsoft přesměrování)
+                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(directUrl)}`;
+                
+                const response = await fetch(proxyUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`Chyba proxy serveru: ${response.status}`);
+                }
+                
+                let textData = await response.text();
+                
+                // Očištění textu od neviditelného znaku BOM, který rozbíjí JSON
+                textData = textData.replace(/^\uFEFF/, '').trim();
+                
+                const products = JSON.parse(textData);
+                
+                // Načtení data výpočtu z prvního produktu
+                if (products.length > 0 && products[0].DatumVypoctu) {
+                    document.getElementById('calc-date').innerText = products[0].DatumVypoctu;
+                    document.getElementById('calc-date-container').style.display = 'inline';
+                }
 
-const response = await fetch(`aukce.json?t=${new Date().getTime()}`);
-const products = await response.json();
-        
-        if (products.length > 0 && products[0].DatumVypoctu) {
-            document.getElementById('calc-date').innerText = products[0].DatumVypoctu;
-            document.getElementById('calc-date-container').style.display = 'inline';
+                renderProducts(products);
+            } catch (error) {
+                console.error("Chyba při načítání dat z OneDrive:", error);
+                document.getElementById('active-grid').innerHTML = `<div class="alert alert-danger w-100 text-center">Chyba načítání dat z OneDrive. Odkaz nebo proxy služba je dočasně nedostupná. Zkontrolujte prosím konzoli (F12).</div>`;
+            }
         }
-
-        renderProducts(products);
-    } catch (error) {
-        console.error("Chyba při načítání dat z OneDrive:", error);
-        document.getElementById('active-grid').innerHTML = `<div class="alert alert-danger w-100 text-center">Chyba načítání dat z OneDrive. Prohlédněte si konzoli prohlížeče (klávesa F12) pro více detailů.</div>`;
-    }
-}
 
         // --- ŘAZENÍ A VYKRESLENÍ ---
         function renderProducts(products) {
@@ -137,7 +153,6 @@ const products = await response.json();
             let activeItems = [];
             let soldItems = [];
 
-            // Rozdělení podle stavu. Ignorujeme zcela prázdné objekty (např. poslední položka bez názvu z JSONu)
             products.forEach(p => {
                 if (!p.Title) return; 
 
@@ -149,7 +164,6 @@ const products = await response.json();
                 }
             });
 
-            // Pomocná funkce pro bezpečné datum
             const parseDate = (d) => (d && d !== 'N/A') ? new Date(d) : new Date(0);
 
             // Seřazení aktivních (Nejnovější ZalistovanoDne první vlevo nahoře)
@@ -201,7 +215,6 @@ const products = await response.json();
             let dropRaw = parseFloat(p['DenniPoklesProcenta']) || 0;
             let dropPct = (dropRaw > 0 && dropRaw < 1) ? Math.round(dropRaw * 100) : dropRaw;
 
-            // Změna pro čtení počtu bidů přímo z JSON klíče PocetBidu
             const pocetNabidek = parseInt(p['PocetBidu']) || 0;
             
             const priceCurrCzk = Math.round(priceCurrEur * eurRate);
@@ -296,7 +309,3 @@ ${isSoldCategory ?
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-
-
